@@ -5,7 +5,7 @@ class UMPManager {
   /**
    * Returns the outputs from the UMP transaction that are admissible.
    * @param {Object} obj all params given in an object
-   * @param {Array} obj.previousUTXOs UTXOs belonging to the current topic being spent as input in the transaction
+   * @param {Array} [obj.previousUTXOs] UTXOs belonging to the current topic being spent as input in the transaction
    * @param {Object} obj.parsedTransaction transaction containing outputs to admit into the current topic 
    * @returns 
    */
@@ -22,7 +22,23 @@ class UMPManager {
         script: output.outputScript,
         fieldFormat: 'buffer'
       })
-      // TODO: Validate result[...] fields
+
+      // UMP Account Fields (Why should these be decoded here if they are not returned to be stored in the db?)
+      const cwiProtocolAddress = result[0]
+      const issuanceId = result[1]
+      const currentUMPMessage = result[2]
+      const passwordPresentationPrimary = result[3]
+      const passwordRecoveryPrimary = result[4]
+      const presentationRecoveryPrimary = result[5]
+      const passwordPrimaryPrivileged = result[6]
+      const presentationHash = result[7]
+      const passwordSalt = result[8]
+      const recoveryHash = result[9]
+      const presentationKeyEncrypted = result[10]
+      const recoveryKeyEncrypted = result[11]
+      const recoverpasswordKeyEncryptedyHash = result[12]
+
+      // TODO: Validate fields
     }
 
     // if (!Array.isArray(parsedTransaction.out) || parsedTransaction.out.length < 1) {
