@@ -1,0 +1,20 @@
+{
+  "name": "ump-topic-manager",
+  "version": "0.1.0",
+  "description": "Manages a UMP Confederacy Topic",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/p2ppsr/ump-topic-manager.git"
+  },
+  "author": "Peer-to-peer Privacy Systems Research LLC",
+  "license": "PROPRIETARY",
+  "bugs": {
+    "url": "https://github.com/p2ppsr/ump-topic-manager/issues"
+  },
+  "homepage": "https://github.com/p2ppsr/ump-topic-manager#readme"
+}
