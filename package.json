@@ -1,11 +1,14 @@
 {
-  "name": "ump-topic-manager",
+  "name": "@cwi/ump-topic-manager",
   "version": "0.1.0",
   "description": "Manages a UMP Confederacy Topic",
   "main": "src/UMPManager.js",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "publishConfig": {
+    "registry": "https://npm-registry.babbage.systems/"
   },
   "repository": {
     "type": "git",
