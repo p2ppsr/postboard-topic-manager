@@ -20,6 +20,8 @@ const pushdrop = require('pushdrop')
 // Buffer.from(recoveryKeyEncrypted),
 // Buffer.from(passwordKeyEncrypted)
 
+const CWI_PROTOCOL_ADDRESS = '14HpZFLijstRS8H1P7b6NdMeCyH6HjeBXF'
+
 class UMPTopicManager {
   /**
    * Returns the outputs from the UMP transaction that are admissible.
@@ -53,7 +55,7 @@ class UMPTopicManager {
             fieldFormat: 'buffer'
           })
 
-          if (result.fields[0].toString() === '14HpZFLijstRS8H1P7b6NdMeCyH6HjeBXF') {
+          if (result.fields[0].toString() === CWI_PROTOCOL_ADDRESS) {
           // Check if this is an update, or a new UMP token
             if (result.fields[2].toString('hex') !== '01') {
               const [previousUTXO] = previousUTXOs.filter(x => x.txid === output.prevTxid)
