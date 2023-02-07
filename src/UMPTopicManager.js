@@ -39,7 +39,7 @@ class UMPTopicManager {
         throw e
       }
       if (!Array.isArray(parsedTransaction.inputs) || parsedTransaction.inputs.length < 1) {
-        const e = new Error('An array of transaction inputs is required!') // TODO Update error format
+        const e = new Error('An array of transaction inputs is required!')
         e.code = 'ERR_TX_INPUTS_REQUIRED'
         throw e
       }
@@ -85,8 +85,7 @@ class UMPTopicManager {
             outputs.push(i)
           }
         } catch (error) {
-          // Probably not a PushDrop token
-          console.error(error)
+          // Probably not a PushDrop token so do nothing
         }
       }
       if (outputs.length === 0) {
