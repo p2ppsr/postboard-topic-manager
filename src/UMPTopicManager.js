@@ -69,7 +69,7 @@ class UMPTopicManager {
               const previousTXID = previousOutpoint.slice(0, 64)
               const previousVout = parseInt(previousOutpoint.slice(64), 16)
               if (previousTXID !== previousUTXO[0].txid || previousVout !== previousUTXO[0].vout) {
-                const e = new Error('Transaction does not spend some issuance output') // ?
+                const e = new Error('Transaction does not spend some issuance output')
                 e.code = 'ERR_INVALID_TX'
                 throw e
               }
