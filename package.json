@@ -2,9 +2,9 @@
   "name": "@cwi/ump-topic-manager",
   "version": "0.1.0",
   "description": "Manages a UMP Confederacy Topic",
-  "main": "src/UMPManager.js",
+  "main": "src/UMPTopicManager.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx tsc"
   },
   "publishConfig": {
     "registry": "https://npm-registry.babbage.systems/"
@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/p2ppsr/ump-topic-manager/issues"
   },
-  "homepage": "https://github.com/p2ppsr/ump-topic-manager#readme"
+  "homepage": "https://github.com/p2ppsr/ump-topic-manager#readme",
+  "dependencies": {
+    "babbage-bsv": "^0.1.1",
+    "pushdrop": "^0.1.16"
+  }
 }
