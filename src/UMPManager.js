@@ -20,8 +20,6 @@ const pushdrop = require('pushdrop')
 // Buffer.from(recoveryKeyEncrypted),
 // Buffer.from(passwordKeyEncrypted)
 
-// let currentOutpoint = parsedTransaction.tx.h+Number(out.i).toString(16).padStart(8, '0')
-
 class UMPManager {
   /**
    * Returns the outputs from the UMP transaction that are admissible.
@@ -36,10 +34,14 @@ class UMPManager {
 
       // Validate params
       if (!Array.isArray(parsedTransaction.outputs) || parsedTransaction.outputs.length < 1) {
-        throw new Error('Transaction outputs must be included as an array!')
+        const e = new Error('Transaction outputs must be included as an array!')
+        e.code = 'ERR_TX_OUTPUTS_REQUIRED'
+        throw e
       }
       if (!Array.isArray(parsedTransaction.inputs) || parsedTransaction.inputs.length < 1) {
-        throw new Error('An array of transaction inputs is required!') // TODO Update error format
+        const e = new Error('An array of transaction inputs is required!') // TODO Update error format
+        e.code = 'ERR_TX_INPUTS_REQUIRED'
+        throw e
       }
 
       // Try to decode and validate transaction outputs
@@ -51,8 +53,6 @@ class UMPManager {
             fieldFormat: 'buffer'
           })
 
-          // const OP_CHECKSIG = 172 // This check isn't needed right?
-
           if (result.fields[0].toString() === '14HpZFLijstRS8H1P7b6NdMeCyH6HjeBXF') {
           // Check if this is an update, or a new UMP token
             if (result.fields[2].toString('hex') !== '01') {
@@ -62,9 +62,11 @@ class UMPManager {
                 e.code = 'ERR_TOKEN_NOT_FOUND'
                 throw e
               }
-              // TODO: Just check it matches?
-              const issuanceIdMatches = result.fields[1].toString('hex').includes(previousUTXO[0].txid)
-              if (!issuanceIdMatches) {
+              // Validate the previousTXID is correct
+              const previousOutpoint = result.fields[1].toString('hex')
+              const previousTXID = previousOutpoint.slice(0, 64)
+              const previousVout = parseInt(previousOutpoint.slice(64), 16)
+              if (previousTXID !== previousUTXO[0].txid || previousVout !== previousUTXO[0].vout) {
                 const e = new Error('Transaction does not spend some issuance output') // ?
                 e.code = 'ERR_INVALID_TX'
                 throw e
@@ -96,7 +98,7 @@ class UMPManager {
       // Returns an array of output numbers
       return outputs
     } catch (error) {
-      return [0] // TODO: remove temp code
+      return []
     }
   }
 }
