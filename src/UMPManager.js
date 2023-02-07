@@ -20,7 +20,7 @@ const pushdrop = require('pushdrop')
 // Buffer.from(recoveryKeyEncrypted),
 // Buffer.from(passwordKeyEncrypted)
 
-class UMPManager {
+class UMPTopicManager {
   /**
    * Returns the outputs from the UMP transaction that are admissible.
    * @param {Object} obj all params given in an object
@@ -102,4 +102,4 @@ class UMPManager {
     }
   }
 }
-module.exports = UMPManager
+module.exports = UMPTopicManager
