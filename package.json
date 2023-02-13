@@ -16,9 +16,9 @@
   "author": "Peer-to-peer Privacy Systems Research LLC",
   "license": "PROPRIETARY",
   "bugs": {
-    "url": "https://github.com/p2ppsr/ump-topic-manager/issues"
+    "url": "https://github.com/p2ppsr/uhrp-topic-manager/issues"
   },
-  "homepage": "https://github.com/p2ppsr/ump-topic-manager#readme",
+  "homepage": "https://github.com/p2ppsr/uhrp-topic-manager#readme",
   "dependencies": {
     "babbage-bsv": "^0.1.1",
     "pushdrop": "^0.1.16"
