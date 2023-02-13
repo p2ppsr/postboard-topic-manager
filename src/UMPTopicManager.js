@@ -1,30 +1,14 @@
 const bsv = require('babbage-bsv')
 const pushdrop = require('pushdrop')
 /**
- * Responsible for managing the admission of UMP UTXOs
+ * Responsible for managing the admission of UHRP UTXOs
  */
 // Fields Template for Reference
-// // UMP Account Fields
-// Buffer.from(CWI_PROTOCOL_ADDRESS, 'utf8'),
-// Buffer.from(issuanceId, 'hex'), // Issuance txid and output index (faucet)
-// Buffer.from('01', 'hex'), // current UMP message (1 for new user) renditionId>
-// Buffer.from(passwordPresentationPrimary),
-// Buffer.from(passwordRecoveryPrimary),
-// Buffer.from(presentationRecoveryPrimary),
-// Buffer.from(passwordPrimaryPrivileged),
-// Buffer.from(presentationRecoveryPrivileged),
-// Buffer.from(presentationHash),
-// Buffer.from(passwordSalt),
-// Buffer.from(recoveryHash),
-// Buffer.from(presentationKeyEncrypted),
-// Buffer.from(recoveryKeyEncrypted),
-// Buffer.from(passwordKeyEncrypted)
+// // UHRP Fields
 
-const CWI_PROTOCOL_ADDRESS = '14HpZFLijstRS8H1P7b6NdMeCyH6HjeBXF'
-
-class UMPTopicManager {
+class UHRPTopicManager {
   /**
-   * Returns the outputs from the UMP transaction that are admissible.
+   * Returns the outputs from the UHRP transaction that are admissible.
    * @param {Object} obj all params given in an object
    * @param {Array} [obj.previousUTXOs] UTXOs belonging to the current topic being spent as input in the transaction
    * @param {Object} obj.parsedTransaction transaction containing outputs to admit into the current topic
@@ -48,7 +32,7 @@ class UMPTopicManager {
 
       // Try to decode and validate transaction outputs
       for (const [i, output] of parsedTransaction.outputs.entries()) {
-        // Decode the UMP account fields
+        // Decode the UHRP account fields
         try {
           const result = pushdrop.decode({
             script: output.script.toHex(),
@@ -56,11 +40,11 @@ class UMPTopicManager {
           })
 
           if (result.fields[0].toString() === CWI_PROTOCOL_ADDRESS) {
-          // Check if this is an update, or a new UMP token
+          // Check if this is an update, or a new UHRP token
             if (result.fields[2].toString('hex') !== '01') {
               const [previousUTXO] = previousUTXOs.filter(x => x.txid === output.prevTxid)
               if (!previousUTXO) {
-                const e = new Error('Could not find UMP token to update!')
+                const e = new Error('Could not find UHRP token to update!')
                 e.code = 'ERR_TOKEN_NOT_FOUND'
                 throw e
               }
@@ -103,4 +87,4 @@ class UMPTopicManager {
     }
   }
 }
-module.exports = UMPTopicManager
+module.exports = UHRPTopicManager
