@@ -42,7 +42,6 @@ class UHRPTopicManager {
   /**
    * Returns the outputs from the UHRP transaction that are admissible.
    * @param {Object} obj all params given in an object
-   * *** NOT REQUIRED? @param {Array} [obj.previousUTXOs] - No token update currently necessary ***
    * @param {Object} obj.parsedTransaction transaction containing outputs to admit into the current topic
    * @returns
    */
@@ -51,17 +50,44 @@ class UHRPTopicManager {
       const outputs = []
 
       // Validate params
-      if (!Array.isArray(parsedTransaction.outputs) || parsedTransaction.outputs.length < 1) {
-        const e = new Error('Transaction outputs must be included as an array!')
-        e.code = 'ERR_TX_OUTPUTS_REQUIRED'
-        throw e
-      }
       if (!Array.isArray(parsedTransaction.inputs) || parsedTransaction.inputs.length < 1) {
         const e = new Error('An array of transaction inputs is required!')
         e.code = 'ERR_TX_INPUTS_REQUIRED'
         throw e
       }
+      if (!Array.isArray(parsedTransaction.outputs) || parsedTransaction.outputs.length < 1) {
+        const e = new Error('Transaction outputs must be included as an array!')
+        e.code = 'ERR_TX_OUTPUTS_REQUIRED'
+        throw e
+      }
 
+      let previousTXIDORVoutExists = false
+      for (const [i, input] of parsedTransaction.input.entries()) {
+        // Decode the UHRP Advertisment input fields
+        try {
+          const result = pushdrop.decode({
+            script: input.script.toHex(),
+            fieldFormat: 'buffer'
+          })
+
+          // Validate that either previousTXID or previousVout exist
+          const previousOutpoint = result.fields[1].toString('hex')
+          const previousTXID = previousOutpoint.slice(0, 64)
+          const previousVout = parseInt(previousOutpoint.slice(64), 16)
+
+          previousTXIDORVoutExists = previousTXID !== undefined || previousVout !== undefined
+          if (previousTXIDORVoutExists) break
+            
+        } catch (error) {
+          // Probably not a PushDrop token so do nothing
+        }
+      }
+      if (!previousTXIDORVoutExists) {
+        const e = new Error('UHRP Advertisment transaction does not have a valid input')
+        e.code = 'ERR_INVALID_TX_INPUT'
+        throw e
+      }
+       
       // Try to decode and validate transaction outputs
       for (const [i, output] of parsedTransaction.outputs.entries()) {
         // Decode the UHRP account fields
@@ -72,7 +98,7 @@ class UHRPTopicManager {
           })
 
           if (result.fields[0].toString() !== UHRP_PROTOCOL_ADDRESS) {
-            const e = new Error('This transaction is not a valid UHRP advertisement!')
+            const e = new Error('This transaction is not a valid UHRP advertisment!')
             e.code = 'ERR_UNDEFINED_OUT'
             throw e
           }
@@ -83,7 +109,7 @@ class UHRPTopicManager {
           const previousVout = parseInt(previousOutpoint.slice(64), 16)
           if (previousTXID !== previousUTXO[0].txid || previousVout !== previousUTXO[0].vout) {
             const e = new Error('Transaction does not spend some issuance output')
-            e.code = 'ERR_INVALID_TX'
+            e.code = 'ERR_INVALID_TX_OUTPUT'
             throw e
           }
 
