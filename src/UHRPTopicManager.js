@@ -83,7 +83,7 @@ class UHRPTopicManager {
         }
       }
       if (!previousTXIDORVoutExists) {
-        const e = new Error('UHRP Advertisment transaction does not have a valid input')
+        const e = new Error('UHRP Advertisment transaction does not have valid inputs')
         e.code = 'ERR_INVALID_TX_INPUT'
         throw e
       }
