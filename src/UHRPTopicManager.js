@@ -4,17 +4,47 @@ const pushdrop = require('pushdrop')
  * Responsible for managing the admission of UHRP UTXOs
  */
 // Fields Template for Reference
-// // UHRP Fields
+// UHRP and UMP Fields
+/*  
+  // UMP user
+  // const user = [
+  //  Buffer.from(CWI_PROTOCOL_ADDRESS, 'utf8'),
+  //  Buffer.from(issuanceId, 'hex'), // Issuance txid and output index (faucet)
+  //  Buffer.from('01', 'hex'), // current UMP message (1 for new user)
+  //  Buffer.from(passwordPresentationPrimary),
+  //  Buffer.from(passwordRecoveryPrimary),
+  //  Buffer.from(presentationRecoveryPrimary),
+  //  Buffer.from(passwordPrimaryPrivileged),
+  //  Buffer.from(presentationRecoveryPrivileged),
+  //  Buffer.from(presentationHash),
+  //  Buffer.from(passwordSalt),
+  //  Buffer.from(recoveryHash),
+  //  Buffer.from(presentationKeyEncrypted),
+  //  Buffer.from(recoveryKeyEncrypted),
+  //  Buffer.from(passwordKeyEncrypted)
+  //]
+  UHRP Advertisment from createUHRPAdvertisment.js
+  fields: [
+    Buffer.from('1UHRPYnMHPuQ5Tgb3AF8JXqwKkmZVy5hG', 'utf8'),
+    Buffer.from(`${preaction.txid}00000000`, 'hex'),
+    Buffer.from(address, 'utf8'),
+    hash,
+    Buffer.from('advertise', 'utf8'),
+    Buffer.from(url, 'utf8'),
+    Buffer.from('' + expiryTime, 'utf8'),
+    Buffer.from('' + contentLength, 'utf8')
+  ]   
+*/
 
 class UHRPTopicManager {
   /**
    * Returns the outputs from the UHRP transaction that are admissible.
    * @param {Object} obj all params given in an object
-   * @param {Array} [obj.previousUTXOs] UTXOs belonging to the current topic being spent as input in the transaction
+   * *** NOT REQUIRED? @param {Array} [obj.previousUTXOs] - No token update currently necessary ***
    * @param {Object} obj.parsedTransaction transaction containing outputs to admit into the current topic
    * @returns
    */
-  identifyAdmissibleOutputs ({ previousUTXOs, parsedTransaction }) {
+  identifyAdmissibleOutputs ({ parsedTransaction }) {
     try {
       const outputs = []
 
@@ -39,44 +69,41 @@ class UHRPTopicManager {
             fieldFormat: 'buffer'
           })
 
-          if (result.fields[0].toString() === CWI_PROTOCOL_ADDRESS) {
-          // Check if this is an update, or a new UHRP token
-            if (result.fields[2].toString('hex') !== '01') {
-              const [previousUTXO] = previousUTXOs.filter(x => x.txid === output.prevTxid)
-              if (!previousUTXO) {
-                const e = new Error('Could not find UHRP token to update!')
-                e.code = 'ERR_TOKEN_NOT_FOUND'
-                throw e
-              }
-              // Validate the previousTXID is correct
-              const previousOutpoint = result.fields[1].toString('hex')
-              const previousTXID = previousOutpoint.slice(0, 64)
-              const previousVout = parseInt(previousOutpoint.slice(64), 16)
-              if (previousTXID !== previousUTXO[0].txid || previousVout !== previousUTXO[0].vout) {
-                const e = new Error('Transaction does not spend some issuance output')
-                e.code = 'ERR_INVALID_TX'
-                throw e
-              }
-            }
-
-            // Use ECDSA to verify signature
-            const hasValidSignature = bsv.crypto.ECDSA.verify(
-              bsv.crypto.Hash.sha256(Buffer.concat(result.fields)),
-              bsv.crypto.Signature.fromString(result.signature),
-              bsv.PublicKey.fromString(result.lockingPublicKey)
-            )
-            if (!hasValidSignature) {
-              throw new Error('Invalid Signature')
-            }
-            outputs.push(i)
+          UHRP_PROTOCOL_ADDRESS = '1UHRPYnMHPuQ5Tgb3AF8JXqwKkmZVy5hG'
+          if (result.fields[0].toString() !== UHRP_PROTOCOL_ADDRESS) {
+            const e = new Error('This transaction is not a valid UHRP advertisement!')
+            e.code = 'ERR_UNDEFINED_OUT'
+            throw e
           }
+
+          // Validate the previousTXID is correct
+          const previousOutpoint = result.fields[1].toString('hex')
+          const previousTXID = previousOutpoint.slice(0, 64)
+          const previousVout = parseInt(previousOutpoint.slice(64), 16)
+          if (previousTXID !== previousUTXO[0].txid || previousVout !== previousUTXO[0].vout) {
+            const e = new Error('Transaction does not spend some issuance output')
+            e.code = 'ERR_INVALID_TX'
+            throw e
+          }
+
+          // Use ECDSA to verify signature
+          const hasValidSignature = bsv.crypto.ECDSA.verify(
+            bsv.crypto.Hash.sha256(Buffer.concat(result.fields)),
+            bsv.crypto.Signature.fromString(result.signature),
+            bsv.PublicKey.fromString(result.lockingPublicKey)
+          )
+          if (!hasValidSignature) {
+            throw new Error('Invalid Signature')
+          }
+          outputs.push(i)
+
         } catch (error) {
           // Probably not a PushDrop token so do nothing
         }
       }
       if (outputs.length === 0) {
         throw new Error(
-          'This transaction does not publish a valid CWI account descriptor!'
+          'This transaction does not publish a valid UHRP Avertisment descriptor!'
         )
       }
 
