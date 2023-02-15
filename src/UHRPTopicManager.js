@@ -36,6 +36,8 @@ const pushdrop = require('pushdrop')
   ]   
 */
 
+const UHRP_PROTOCOL_ADDRESS = '1UHRPYnMHPuQ5Tgb3AF8JXqwKkmZVy5hG'
+
 class UHRPTopicManager {
   /**
    * Returns the outputs from the UHRP transaction that are admissible.
@@ -69,7 +71,6 @@ class UHRPTopicManager {
             fieldFormat: 'buffer'
           })
 
-          UHRP_PROTOCOL_ADDRESS = '1UHRPYnMHPuQ5Tgb3AF8JXqwKkmZVy5hG'
           if (result.fields[0].toString() !== UHRP_PROTOCOL_ADDRESS) {
             const e = new Error('This transaction is not a valid UHRP advertisement!')
             e.code = 'ERR_UNDEFINED_OUT'
