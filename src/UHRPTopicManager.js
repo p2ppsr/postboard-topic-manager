@@ -26,7 +26,7 @@ const pushdrop = require('pushdrop')
   UHRP Advertisment from createUHRPAdvertisment.js
   fields: [
     Buffer.from('1UHRPYnMHPuQ5Tgb3AF8JXqwKkmZVy5hG', 'utf8'),
-    Buffer.from(`${preaction.txid}00000000`, 'hex'),
+    Buffer.from(`${preaction.txid}00000000`, 'hex'), <----- GONE!
     Buffer.from(address, 'utf8'),
     hash,
     Buffer.from('advertise', 'utf8'),
@@ -61,32 +61,119 @@ class UHRPTopicManager {
         throw e
       }
 
-      let previousTXIDORVoutExists = false
-      for (const [i, input] of parsedTransaction.input.entries()) {
-        // Decode the UHRP Advertisment input fields
-        try {
-          const result = pushdrop.decode({
-            script: input.script.toHex(),
-            fieldFormat: 'buffer'
-          })
+      // let previousTXIDORVoutExists = false
+      // for (const [i, input] of parsedTransaction.input.entries()) {
+      //   // Decode the UHRP Advertisment input fields
+      //   try {
+      //     const result = pushdrop.decode({
+      //       script: input.script.toHex(),
+      //       fieldFormat: 'buffer'
+      //     })
 
+          // Note: field indexes may not be correct and should be validated with the pushdrop.create side!
+
+          // TODO: Add validation that matches the relevent checks from the uhrp bridge transformer
+          // Existing code to reference: 
+
+          // Field must be a valid SHA256 hex (all content hashes are SHA256 hashes)
+          // const hashBuf = Buffer.from(out.h5, 'hex')
+          // if (hashBuf.byteLength !== 32) {
+          //   const e = new Error(`Invalid hash length, must be 32 bytes but this value is ${hashBuf.byteLength}`)
+          //   e.code = 'ERR_INVALID_LENGTH_HASH'
+          //   throw e
+          // }
+
+          // if (out.s6 !== 'advertise') {
+          //   const e = new Error('Only advertise is supported (for now), revoke will be added later by spending the PushDrop token and maybe timestamps could be removed')
+          //   e.code = 'ERR_INVALID_SUPPORT_ONLY_ADVERTISE'
+          //   throw e
+          // }
+
+          // // The URL must start with "https://"
+          // if (!out.s7.startsWith('https://')) {
+          //   const e = new Error('URL does not start with "https://"')
+          //   e.code = 'ERR_INVALID_HTTP_PREFIX_URL'
+          //   throw e
+          // }
+
+          // // The URL must contain a "."
+          // if (out.s7.indexOf('.') === -1) {
+          //   const e = new Error('URL does not contain a dot')
+          //   e.code = 'ERR_INVALID_HTTP_DOT_URL'
+          //   throw e
+          // }
+
+          // // The URL must not contain a " "
+          // if (out.s7.indexOf(' ') !== -1) {
+          //   const e = new Error('URL contains a space')
+          //   e.code = 'ERR_INVALID_HTTP_SPACE_URL'
+          //   throw e
+          // }
+
+          // // The timestamp must be an integer
+          // if (!Number.isInteger(Number(out.s8))) {
+          //   const e = new Error('Timestamp must be an integer')
+          //   e.code = 'ERR_TYPE_NOT_INT_TIMESTAMP'
+          //   throw e
+          // }
+
+          // // Timestamp must be greater than 1600000000
+          // if (Number(out.s8) < 1600000000) {
+          //   const e = new Error('Timestamp is too small')
+          //   e.code = 'ERR_INVALID_SIZE_TOO_SMALL_TIMESTAMP'
+          //   throw e
+          // }
+
+          // // Timestamp must be less than 100000000000
+          // if (Number(out.s8) > 100000000000) {
+          //   const e = new Error('Timestamp is too large')
+          //   e.code = 'ERR_INVALID_SIZE_TOO_BIG_TIMESTAMP'
+          //   throw e
+          // }
+
+          // // Content length  must be an integer
+          // if (!Number.isInteger(Number(out.s9))) {
+          //   const e = new Error('Content length must be an integer')
+          //   e.code = 'ERR_TYPE_NOT_INT_CONTENT_LENGTH'
+          //   throw e
+          // }
+
+          // // Content length must be greater than 0
+          // if (Number(out.s9) <= 0) {
+          //   const e = new Error(`Content length must be a positive value: ${out.s9}`)
+          //   e.code = 'ERR_INVALID_LENGTH_TOO_SMALL_CONTENT_LENGTH'
+          //   throw e
+          // }
+
+          // // Current architecture should support up to about 11 gigabyte files
+          // // The bottleneck is in server-side hash calculation (the notifier.)
+          // // The notifier times out after 540 seconds, and hashing takes time.
+          // // If this changes, the limit should be re-evaluated.
+          // // Content length  must be less than 100000000000
+          // if (Number(out.s9) > 11000000000) {
+          //   const e = new Error(`Currently, the maximum supported file size is 11000000000 bytes:${out.s9}. Larger files will be supported in future versions, but consider breaking your file into chunks. Email nanostore-limits@babbage.systems if this causes you pain.`)
+          //   e.code = 'ERR_INVALID_LENGTH_TOO_BIG_CONTENT_LENGTH'
+          //   throw e
+          // }
+
+          // NOT NEEDED (TODO: DELETE)
           // Validate that either previousTXID or previousVout exist
-          const previousOutpoint = result.fields[1].toString('hex')
-          const previousTXID = previousOutpoint.slice(0, 64)
-          const previousVout = parseInt(previousOutpoint.slice(64), 16)
+          // const previousOutpoint = result.fields[1].toString('hex')
+          // const previousTXID = previousOutpoint.slice(0, 64)
+          // const previousVout = parseInt(previousOutpoint.slice(64), 16)
 
-          previousTXIDORVoutExists = previousTXID !== undefined || previousVout !== undefined
-          if (previousTXIDORVoutExists) break
+      //     previousTXIDORVoutExists = previousTXID !== undefined || previousVout !== undefined
+      //     if (previousTXIDORVoutExists) break
             
-        } catch (error) {
-          // Probably not a PushDrop token so do nothing
-        }
-      }
-      if (!previousTXIDORVoutExists) {
-        const e = new Error('UHRP Advertisment transaction does not have valid inputs')
-        e.code = 'ERR_INVALID_TX_INPUT'
-        throw e
-      }
+      //   } catch (error) {
+      //     // Probably not a PushDrop token so do nothing
+      //   }
+      // }
+      // if (!previousTXIDORVoutExists) {
+      //   const e = new Error('UHRP Advertisment transaction does not have valid inputs')
+      //   e.code = 'ERR_INVALID_TX_INPUT'
+      //   throw e
+      // }
        
       // Try to decode and validate transaction outputs
       for (const [i, output] of parsedTransaction.outputs.entries()) {
@@ -104,14 +191,16 @@ class UHRPTopicManager {
           }
 
           // Validate the previousTXID is correct
-          const previousOutpoint = result.fields[1].toString('hex')
-          const previousTXID = previousOutpoint.slice(0, 64)
-          const previousVout = parseInt(previousOutpoint.slice(64), 16)
-          if (previousTXID !== previousUTXO[0].txid || previousVout !== previousUTXO[0].vout) {
-            const e = new Error('Transaction does not spend some issuance output')
-            e.code = 'ERR_INVALID_TX_OUTPUT'
-            throw e
-          }
+          // const previousOutpoint = result.fields[1].toString('hex')
+          // const previousTXID = previousOutpoint.slice(0, 64)
+          // const previousVout = parseInt(previousOutpoint.slice(64), 16)
+          // if (previousTXID !== previousUTXO[0].txid || previousVout !== previousUTXO[0].vout) {
+          //   const e = new Error('Transaction does not spend some issuance output')
+          //   e.code = 'ERR_INVALID_TX_OUTPUT'
+          //   throw e
+          // }
+
+
 
           // Use ECDSA to verify signature
           const hasValidSignature = bsv.crypto.ECDSA.verify(
