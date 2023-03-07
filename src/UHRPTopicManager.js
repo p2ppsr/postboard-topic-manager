@@ -149,18 +149,23 @@ class UHRPTopicManager {
             bsv.PublicKey.fromString(result.lockingPublicKey)
           )
           if (!hasValidSignature) {
-            throw new Error('Invalid Signature')
+            const e = new Error('Invalid Signature')
+            e.code = 'ERR_INVALID_SIGNATURE'
+            throw e
           }
           outputs.push(i)
 
         } catch (error) {
           // Probably not a PushDrop token so do nothing
+          console.log(error)
         }
       }
       if (outputs.length === 0) {
-        throw new Error(
+        const e = new Error(
           'This transaction does not publish a valid UHRP Avertisment descriptor!'
         )
+        e.code = 'ERR_INVALID_ADVERTISEMENT'
+        throw e
       }
 
       // Returns an array of output numbers
