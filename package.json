@@ -1,24 +1,21 @@
 {
-  "name": "@cwi/uhrp-topic-manager",
+  "name": "postboard-topic-manager",
   "version": "0.1.4",
-  "description": "Manages a UHRP Confederacy Topic",
-  "main": "src/UHRPTopicManager.js",
+  "description": "Manages a Postboard Confederacy Topic",
+  "main": "src/PostboardTopicManager.js",
   "scripts": {
     "build": "npx tsc"
   },
-  "publishConfig": {
-    "registry": "https://npm-registry.babbage.systems/"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/p2ppsr/uhrp-topic-manager.git"
+    "url": "git+https://github.com/p2ppsr/postboard-topic-manager.git"
   },
   "author": "Peer-to-peer Privacy Systems Research LLC",
-  "license": "PROPRIETARY",
+  "license": "Open BSV License",
   "bugs": {
-    "url": "https://github.com/p2ppsr/uhrp-topic-manager/issues"
+    "url": "https://github.com/p2ppsr/postboard-topic-manager/issues"
   },
-  "homepage": "https://github.com/p2ppsr/uhrp-topic-manager#readme",
+  "homepage": "https://github.com/p2ppsr/postboard-topic-manager#readme",
   "dependencies": {
     "babbage-bsv": "^0.1.1",
     "pushdrop": "^0.1.16"
