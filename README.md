@@ -8,7 +8,7 @@ Construct a Confederacy instance with this Topic Manager:
 
 ```js
 const Confederacy = require('confederacy')
-const PostboardManager = require('postboard-manager')
+const PostboardManager = require('postboard-topic-manager')
 
 const confederacy = new Confederacy({
   managers: {
