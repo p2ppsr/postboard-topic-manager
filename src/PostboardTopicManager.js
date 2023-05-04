@@ -1,5 +1,7 @@
 const bsv = require('babbage-bsv')
 const pushdrop = require('pushdrop')
+const { getPaymentAddress } = require('sendover')
+
 /**
  * Responsible for managing the admission of Postboard UTXOs
  */
@@ -8,7 +10,6 @@ const pushdrop = require('pushdrop')
 /*  
   fields: [
     Buffer.from('postboard', 'utf8'),
-    identityKey,
     message,
   ]
 */
@@ -42,10 +43,15 @@ class PostboardTopicManager {
       for (const [i, output] of parsedTransaction.outputs.entries()) {
         // Decode the postboard token fields
         try {
-          const result = pushdrop.decode({
-            script: output.script.toHex(),
-            fieldFormat: 'buffer'
-          })
+          let result
+          try {
+            result = pushdrop.decode({
+              script: output.script.toHex(),
+              fieldFormat: 'buffer'
+            })
+          } catch (e) {
+            throw new Error('Not a valid PushDrop token output.')
+          }
 
           if (result.fields[0].toString() !== POSTBOARD_PREFIX) {
             const e = new Error('This transaction is not a valid Postboard token!')
@@ -53,15 +59,7 @@ class PostboardTopicManager {
             throw e
           }
 
-          // Field must be a valid user identity key
-          const identityKeyBuf = Buffer.from(result.fields[1], 'hex')
-          if (identityKeyBuf.byteLength !== 33) {
-            const e = new Error(`Invalid identity key length, must be a 33-byte DER-encoded public key X coordinate, but this value is ${identityKeyBuf.byteLength} bytes.`)
-            e.code = 'ERR_INVALID_IDENTITY_KEY'
-            throw e
-          }
-
-          if (result.fields[2].toString('utf8').length > 2) {
+          if (result.fields[1].toString('utf8').length <= 2) {
             const e = new Error('Postborad messages must be at least 2 characters')
             e.code = 'ERR_INVALID_MESSAGE_LENGTH'
             throw e
@@ -79,16 +77,17 @@ class PostboardTopicManager {
             throw e
           }
 
-          // TODO: Ensure the ownerKey is derived from the field 1 identityKey
-
+          console.log(`Admitting Postboard output #${i} as valid`)
           outputs.push(i)
 
         } catch (error) {
           // Probably not a PushDrop token so do nothing
+          console.error(`Error with output #${i}:`)
           console.log(error)
         }
       }
       // Returns an array of output numbers
+      console.log('Outputs to admit:', )
       return outputs
     } catch (error) {
       return []
