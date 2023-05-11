@@ -59,7 +59,31 @@ class PostboardTopicManager {
             throw e
           }
 
-          if (result.fields[1].toString('utf8').length <= 2) {
+          // Ensure identity key is the correct length
+          if (result.fields[1].byteLength !== 33) {
+            const e = new Error('Identity key must be 33 bytes')
+            e.code = 'ERR_INVALID_IDENTITY_KEY_LENGTH'
+            throw e
+          }
+
+          // Ensure result.lockingPublicKey came from result.fields[1]
+          const expected = getPaymentAddress({
+            senderPrivateKey: '0000000000000000000000000000000000000000000000000000000000000001',
+            recipientPublicKey: result.fields[1].toString('hex'),
+            invoiceNumber: '2-postboard-1',
+            returnType: 'publicKey'
+          })
+          console.log('claimed key', result.fields[1].toString('hex'))
+          console.log('expected child', expected)
+          console.log('actual child', result.lockingPublicKey)
+          if (expected !== result.lockingPublicKey) {
+            const e = new Error('Unable to verify identity public key links to signing key')
+            e.code = 'ERR_IDENTITY_NOT_LINKED'
+            throw e
+          }
+
+          // Ensure post is at least 2 characters
+          if (result.fields[2].toString('utf8').length <= 2) {
             const e = new Error('Postborad messages must be at least 2 characters')
             e.code = 'ERR_INVALID_MESSAGE_LENGTH'
             throw e
