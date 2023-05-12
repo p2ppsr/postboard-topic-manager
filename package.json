@@ -1,6 +1,6 @@
 {
   "name": "postboard-topic-manager",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Manages a Postboard Confederacy Topic",
   "main": "src/PostboardTopicManager.js",
   "scripts": {
